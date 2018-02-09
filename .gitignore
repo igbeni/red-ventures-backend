@@ -22,3 +22,6 @@ nbbuild/
 dist/
 nbdist/
 .nb-gradle/
+
+src/main/resources/liquibase-changeLog.xml
+src/main/resources/liquibase.properties
