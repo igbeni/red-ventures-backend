@@ -9,7 +9,7 @@
     <packaging>jar</packaging>
 
     <name>red-ventures-backend</name>
-    <description></description>
+    <description>Red Ventures - Widget SPA test</description>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -85,7 +85,7 @@
     </dependencies>
 
     <build>
-        <finalName>red-ventures</finalName>
+        <finalName>app</finalName>
 
         <plugins>
             <plugin>
@@ -94,71 +94,33 @@
             </plugin>
 
             <plugin>
-                <groupId>org.liquibase</groupId>
-                <artifactId>liquibase-maven-plugin</artifactId>
-                <version>3.4.1</version>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.20.1</version>
                 <configuration>
-                    <propertyFile>src/main/resources/liquibase.properties</propertyFile>
+                    <images>
+                        <image>
+                            <name>app</name>
+                            <build>
+                                <dockerFileDir>${project.basedir}/src/main/docker</dockerFileDir>
+                                <assembly>
+                                    <mode>dir</mode>
+                                    <targetDir>/app</targetDir>
+                                    <descriptor>${project.basedir}/src/main/docker/assembly.xml</descriptor>
+                                </assembly>
+                            </build>
+                        </image>
+                    </images>
                 </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.liquibase.ext</groupId>
-                        <artifactId>liquibase-hibernate4</artifactId>
-                        <version>3.5</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.springframework</groupId>
-                        <artifactId>spring-beans</artifactId>
-                        <version>4.1.7.RELEASE</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.springframework.data</groupId>
-                        <artifactId>spring-data-jpa</artifactId>
-                        <version>1.7.3.RELEASE</version>
-                    </dependency>
-                </dependencies>
-            </plugin>
-
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>exec-maven-plugin</artifactId>
-                <version>1.6.0</version>
                 <executions>
                     <execution>
-                        <phase>process-resources</phase>
+                        <id>build</id>
+                        <phase>install</phase>
                         <goals>
-                            <goal>java</goal>
+                            <goal>build</goal>
                         </goals>
-                        <configuration>
-                            <mainClass>liquibase.integration.commandline.Main</mainClass>
-                            <includePluginDependencies>true</includePluginDependencies>
-                            <arguments>
-                                <argument>--driver=org.postgresql.Driver</argument>
-                                <argument>--changeLogFile=src/main/resources/liquibase-changeLog-1.xml</argument>
-                                <argument>--url=jdbc:postgresql://localhost:5432/red-ventures</argument>
-                                <argument>--username=postgres</argument>
-                                <argument>--password=postgres</argument>
-                                <argument>--diffTypes=data</argument>
-                                <argument>--logLevel=info</argument>
-                                <argument>generateChangeLog</argument>
-                            </arguments>
-                        </configuration>
                     </execution>
                 </executions>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.postgresql</groupId>
-                        <artifactId>postgresql</artifactId>
-                        <version>9.4.1212.jre7</version>
-                        <scope>runtime</scope>
-                    </dependency>
-
-                    <dependency>
-                        <groupId>org.liquibase</groupId>
-                        <artifactId>liquibase-core</artifactId>
-                        <version>3.5.3</version>
-                    </dependency>
-                </dependencies>
             </plugin>
         </plugins>
     </build>

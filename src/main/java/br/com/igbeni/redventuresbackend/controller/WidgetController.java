@@ -2,7 +2,6 @@ package br.com.igbeni.redventuresbackend.controller;
 
 import br.com.igbeni.redventuresbackend.models.Widget;
 import br.com.igbeni.redventuresbackend.models.request.WidgetRequest;
-import br.com.igbeni.redventuresbackend.repository.UserRepository;
 import br.com.igbeni.redventuresbackend.repository.WidgetRepository;
 import io.swagger.annotations.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +26,9 @@ public class WidgetController {
     @ApiOperation(
             value = "Find all widgets",
             authorizations = {@Authorization(value = "Authorization", scopes = {})},
-            notes = "This can only be done by the logged in user."
+            notes = "This can only be done by the logged in user.",
+            response = Widget.class,
+            responseContainer = "List"
     )
     @GetMapping(value = "", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<?> getWidgets() {
@@ -37,7 +38,8 @@ public class WidgetController {
     @ApiOperation(
             value = "Find widget by ID",
             authorizations = {@Authorization(value = "Authorization", scopes = {})},
-            notes = "This can only be done by the logged in user."
+            notes = "This can only be done by the logged in user.",
+            response = Widget.class
     )
     @ApiResponses(
             value = {
@@ -47,13 +49,20 @@ public class WidgetController {
     )
     @GetMapping(value = "{id}", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<?> getWidgetById(@ApiParam(value = "Widget ID", required = true) @PathVariable("id") Integer id) {
-        return ResponseEntity.ok(widgetRepository.findOne(id));
+        Widget widget = widgetRepository.findOne(id);
+
+        if (widget == null) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        }
+
+        return ResponseEntity.ok(widget);
     }
 
     @ApiOperation(
             value = "Create new widget",
             authorizations = {@Authorization(value = "Authorization", scopes = {})},
-            notes = "This can only be done by the logged in user."
+            notes = "This can only be done by the logged in user.",
+            response = Widget.class
     )
     @PostMapping(value = "", consumes = MediaType.APPLICATION_JSON_UTF8_VALUE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<?> createWidget(@RequestBody WidgetRequest widgetRequest) {
@@ -70,7 +79,8 @@ public class WidgetController {
     @ApiOperation(
             value = "Update existing widget",
             authorizations = {@Authorization(value = "Authorization", scopes = {})},
-            notes = "This can only be done by the logged in user."
+            notes = "This can only be done by the logged in user.",
+            response = Widget.class
     )
     @ApiResponses(
             value = {
@@ -83,7 +93,7 @@ public class WidgetController {
                                           @ApiParam(value = "Updated widget object", required = true) @RequestBody WidgetRequest widgetRequest) {
         Widget widget = widgetRepository.findOne(id);
         if (widget == null) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
         }
 
         widget.setColor(widgetRequest.getColor());
